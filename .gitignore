@@ -1,5 +1,4 @@
 .terraform
-*.tfvars
 *.tfstate*
 *.cfg
 .terraform.lock.hcl
