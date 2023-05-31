@@ -9,31 +9,40 @@ terraform {
 
 variable "do_token" {}
 
+# Variables whose values are defined in ./terraform.tfvars
+variable "domain_name" {}
+variable "droplet_image" {}
+variable "droplet_name" {}
+variable "droplet_region" {}
+variable "droplet_size" {}
+variable "ssh_key_name" {}
+variable "ssh_local_path" {}
+
 provider "digitalocean" {
   token = var.do_token
 }
 
-resource "digitalocean_ssh_key" "davidpeachme" {
-  name       = "davidpeachme"
-  public_key = file("/home/david/.ssh/id_rsa.davidpeachme.pub")
+resource "digitalocean_ssh_key" "ssh_key" {
+  name       = var.ssh_key_name
+  public_key = file(var.ssh_local_path)
 }
 
-resource "digitalocean_droplet" "davidpeachme" {
-  image    = "ubuntu-22-10-x64"
-  name     = "davidpeach.me"
-  region   = "lon1"
-  size     = "s-1vcpu-1gb"
-  ssh_keys = [digitalocean_ssh_key.davidpeachme.fingerprint]
+resource "digitalocean_droplet" "droplet" {
+  image    = var.droplet_image
+  name     = var.droplet_name
+  region   = var.droplet_region
+  size     = var.droplet_size
+  ssh_keys = [digitalocean_ssh_key.ssh_key.fingerprint]
 }
 
-data "digitalocean_domain" "davidpeachme" {
-  name = "davidpeach.me"
+data "digitalocean_domain" "domain" {
+  name = var.domain_name
 }
 
-resource "digitalocean_record" "davidpeachme" {
-  domain = data.digitalocean_domain.davidpeachme.id
+resource "digitalocean_record" "record" {
+  domain = data.digitalocean_domain.domain.id
   type   = "A"
   name   = "@"
   ttl    = 60
-  value  = "${digitalocean_droplet.davidpeachme.ipv4_address}"
+  value  = "${digitalocean_droplet.droplet.ipv4_address}"
 }
