@@ -47,3 +47,8 @@ resource "digitalocean_record" "record" {
   ttl    = 60
   value  = "${digitalocean_droplet.droplet.ipv4_address}"
 }
+
+output "droplet_id_v4_address" {
+  value = digitalocean_droplet.droplet.ipv4_address
+}
+
