@@ -17,6 +17,7 @@ variable "droplet_region" {}
 variable "droplet_size" {}
 variable "ssh_key_name" {}
 variable "ssh_local_path" {}
+variable "a_record_name" {}
 
 provider "digitalocean" {
   token = var.do_token
@@ -42,7 +43,7 @@ data "digitalocean_domain" "domain" {
 resource "digitalocean_record" "record" {
   domain = data.digitalocean_domain.domain.id
   type   = "A"
-  name   = "@"
+  name   = var.a_record_name
   ttl    = 60
   value  = "${digitalocean_droplet.droplet.ipv4_address}"
 }
